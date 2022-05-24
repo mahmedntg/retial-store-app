@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  gateway-container:
+    image: gateway:1
+    build:
+      context: derayah-gateway
+      dockerfile: ./Dockerfile
+    volumes:
+      - /data/gateway
+    ports:
+      - "8080:8080"
+  
+  retail-store-container:
+        image: retail-store:1
+        build:
+          context: derayah-retail-store
+          dockerfile: ./Dockerfile
+        volumes:
+          - /data/retail-store
+        ports:
+          - "8081:8081"
+        depends_on:
+          - gateway-container
