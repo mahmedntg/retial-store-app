@@ -18,7 +18,7 @@ a discount).
   1. gateway project: gateway for the store service API
   2. store project that contains pay API
 - move to the project folder that contains docker-compose.yml file
--  run this command: docker-compose up -d --force-recreate  --renew-anon-volumes  this will create three docker images as following:-
+- run this command: docker-compose up -d --force-recreate  --renew-anon-volumes  this will create three docker images as following:-
   1. gateway-container: gateway
   2. mongo: mongo DB for storing the provides user types
   3. store-container: store image
