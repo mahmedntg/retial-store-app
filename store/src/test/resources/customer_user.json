@@ -1,0 +1,13 @@
+{
+  "username": "affiliate",
+  "registerDate": "2022-01-01",
+  "accountNonExpired": true,
+  "accountNonLocked": true,
+  "credentialsNonExpired": true,
+  "enabled": true,
+  "authorities": [
+    {
+      "authority": "CUSTOMER"
+    }
+  ]
+}

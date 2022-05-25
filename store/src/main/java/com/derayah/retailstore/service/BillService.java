@@ -19,9 +19,9 @@ import java.math.BigDecimal;
 @RequiredArgsConstructor
 public class BillService {
     private final UserService userService;
+    private final DiscountHelper helper;
 
     public BigDecimal applyDiscount(final UserDetails user, final Bill bill) {
-        DiscountHelper helper = new DiscountHelper();
 
         BigDecimal totalAmount = helper.calculateTotal(bill.getItems());
         BigDecimal groceryAmount = helper.calculateTotalPerType(bill.getItems(), ItemType.GROCERY);
@@ -32,8 +32,7 @@ public class BillService {
             nonGroceryAmount = helper.calculateDiscount(nonGroceryAmount, userDiscount);
         }
 
-        BigDecimal finalAmount = (groceryAmount.add(nonGroceryAmount).subtract(billsDiscount));
-        return finalAmount;
+        return (groceryAmount.add(nonGroceryAmount).subtract(billsDiscount));
     }
 }
 

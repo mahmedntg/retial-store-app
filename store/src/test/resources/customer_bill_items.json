@@ -1,0 +1,18 @@
+{
+  "bill": {
+    "items": [
+      {
+        "type": "TECHNOLOGY",
+        "price": 100.0
+      },
+      {
+        "type": "GROCERY",
+        "price": 100.0
+      },
+      {
+        "type": "CLOTHES",
+        "price": 100.0
+      }
+    ]
+  }
+}

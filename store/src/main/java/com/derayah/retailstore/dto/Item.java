@@ -1,5 +1,6 @@
 package com.derayah.retailstore.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
  */
 @Setter
 @Getter
+@AllArgsConstructor
 public class Item {
     private ItemType type;
 

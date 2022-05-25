@@ -5,6 +5,7 @@ import com.derayah.retailstore.dto.ItemType;
 import com.derayah.retailstore.dto.UserType;
 import com.derayah.retailstore.response.UserAuthority;
 import com.derayah.retailstore.response.UserDetails;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -19,6 +20,7 @@ import java.util.Set;
  * @author : Mo Sayed
  * @since : 5/23/2022
  */
+@Component
 public class DiscountHelper {
     private static final int YEARS_FOR_DISCOUNT = 2;
 
