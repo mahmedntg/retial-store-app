@@ -21,7 +21,7 @@ import java.util.Set;
  * @since : 5/23/2022
  */
 @Component
-public class DiscountHelper {
+public class    DiscountHelper {
     private static final int YEARS_FOR_DISCOUNT = 2;
 
     private static final double EMPLOYEE_DISCOUNT_PERCENTAGE = 0.30;

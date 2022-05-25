@@ -1,4 +1,4 @@
-package com.derayah.gateway;
+package com.derayah.gateway.config;
 
 import com.derayah.gateway.authentication.Role;
 import com.derayah.gateway.authentication.User;

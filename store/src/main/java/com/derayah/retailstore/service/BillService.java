@@ -18,7 +18,6 @@ import java.math.BigDecimal;
 @Service
 @RequiredArgsConstructor
 public class BillService {
-    private final UserService userService;
     private final DiscountHelper helper;
 
     public BigDecimal applyDiscount(final UserDetails user, final Bill bill) {

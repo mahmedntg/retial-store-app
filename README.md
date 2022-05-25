@@ -1,37 +1,76 @@
-# gateway for the retail-store microserivce
-# first use docker-compose file to run the required services
-1- to call the gateway first to be authenticated
+# Retail Store
 
-# hit localhost:8080/api/auth/signin   POST request
+### Introduction
+Retail Store API is a simple project that is calculating discounts for different
+types of users, following specific Discount rules:
+
+1. If the user is an employee of the store, he gets a 30% discount.
+2. If the user is an affiliate of the store, he gets a 10% discount.
+3. If the user has been a customer for over 2 years, he gets a 5% discount.
+4. For every $100 on the bill, there would be a $ 5 discount (e.g. for $ 990, you get $ 45 as
+a discount).
+5. The percentage based discounts do not apply on groceries.
+6. A user can get only one of the percentage based discounts on a bill
+
+### Install & Run using docker-compose
+- Clone the repository
+- use mvn to clean and package the following:-
+  1. gateway project: gateway for the store service API
+  2. store project that contains pay API
+- move to the project folder that contains docker-compose.yml file
+-  run this command: docker-compose up -d --force-recreate  --renew-anon-volumes  this will create three docker images as following:-
+  1. gateway-container: gateway
+  2. mongo: mongo DB for storing the provides user types
+  3. store-container: store image
+- The app should be up and running on `localhost:8080`
+
+### Tooling
+- Swagger - API documentation
+- JWT - authentication mechanism
+- mongodb - db for the store app
+- eureka client
+- spring eureka server as service discovery
+
+### UML Class Diagram
+![](store-app.png)
+
+### Testing
+To run all tests, execute the following command
+```
+./mvnw clean test
+```
+
+### Demo Data
+`UserConfig` class will load test users when the application starts.
+Password is `test1` to all users.
+Usernames are as follows:
+```
+employee
+affiliate
+customer
+```
+### Sample request flow
+- Get authentication token
+```
+Request
+POST /api/auth/signin
 {
-"username":"employee",
-"password":"test1"
+  "username": "employee@retail.com",
+  "password": "secret"
 }
-
-or
-
+```
+```$xslt
+Response
 {
-"username":"affiliate",
-"password":"test1"
+    "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZmZpbGlhdGUiLCJpYXQiOjE2NTM0NTQ3ODEsImV4cCI6MTY1MzU0MTE4MX0.rQz-TlZ8cztEDWnkjP-qd9RrlUC55AQnaZoblRd5s02Mx51kb91zjsFrOL8YdnKWktUCOvOtw9gNHYNIHTwfcg",
 }
-
-or
-
-{
-"username":"customer",
-"password":"test1"
-}
-
-# your will get a response contains JWT token to use it for calling any authenticated service
-
-{
-    "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZmZpbGlhdGUiLCJpYXQiOjE2NTM0MTU5MzMsImV4cCI6MTY1MzUwMjMzM30.Ao9N0Sm2MIqTDSpNGryuVI7A0bOfTwIaGdO-4ZLLHV54tpUB8Z5f8zsLf79XuNMlXowaNCxlys3Jd-4QlLvGyg",
-}
-
-
-2- call the retail-store service
-# hit localhost:8080/api/store/pay   POST request
-
+```
+- Calculate discount for the logged in user
+```$xslt
+Request
+POST /api/store/pay
+HEADER: Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZmZpbGlhdGUiLCJpYXQiOjE2NTM0NTQ3ODEsImV4cCI6MTY1MzU0MTE4MX0.rQz-TlZ8cztEDWnkjP-qd9RrlUC55AQnaZoblRd5s02Mx51kb91zjsFrOL8YdnKWktUCOvOtw9gNHYNIHTwfcg
+PAYLOAD
 {
     "bill": {
         "items": [
@@ -50,6 +89,10 @@ or
         ]
     }
 }
-
-
-# you will get the payable amount ex: 858.900
+```
+```$xslt
+Response
+{
+  968.700
+}
+```
