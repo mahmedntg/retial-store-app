@@ -1,24 +1,43 @@
-version: '3'
+version: "3"
 
 services:
   gateway-container:
-    image: gateway:1
     build:
-      context: derayah-gateway
+      context: ./gateway
       dockerfile: ./Dockerfile
     volumes:
       - /data/gateway
     ports:
       - "8080:8080"
+    environment:  
+      - spring.data.mongodb.host=mongo
+      - zuul.routes.middleware.url=http://store-container:8081/
+  mongo:
+    image: mongo:latest
+    hostname: mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin123
+      - MONGO_INITDB_DATABASE=retail-store
+      - MONGO_DB_USERNAME=admin
+      - MONGO_DB_PASSWORD=admin123
+    volumes:
+      - ./mdb-data:/data/db
+  store-container:
+    build:
+      context: ./store
+      dockerfile: ./Dockerfile
+    volumes:
+      - /data/store
+    ports:
+      - "8081:8081"
+    depends_on:
+      - gateway-container
+    environment:  
+      - eureka.client.serviceUrl.defaultZone=http://gateway-container:8080/eureka/
+      - instance.hostname=gateway-container
+      - user.baseUrl=http://gateway-container:8080/api/auth/token
   
-  retail-store-container:
-        image: retail-store:1
-        build:
-          context: derayah-retail-store
-          dockerfile: ./Dockerfile
-        volumes:
-          - /data/retail-store
-        ports:
-          - "8081:8081"
-        depends_on:
-          - gateway-container
