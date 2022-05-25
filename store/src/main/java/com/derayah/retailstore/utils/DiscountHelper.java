@@ -3,14 +3,12 @@ package com.derayah.retailstore.utils;
 import com.derayah.retailstore.dto.Item;
 import com.derayah.retailstore.dto.ItemType;
 import com.derayah.retailstore.dto.UserType;
+import com.derayah.retailstore.exception.InternalException;
 import com.derayah.retailstore.response.UserAuthority;
 import com.derayah.retailstore.response.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 import java.util.Set;
 
@@ -21,23 +19,25 @@ import java.util.Set;
  * @since : 5/23/2022
  */
 @Component
-public class    DiscountHelper {
-    private static final int YEARS_FOR_DISCOUNT = 2;
+public class DiscountHelper {
 
-    private static final double EMPLOYEE_DISCOUNT_PERCENTAGE = 0.30;
-    private static final double AFFILIATE_DISCOUNT_PERCENTAGE = 0.10;
-    private static final double CUSTOMER_DISCOUNT_PERCENTAGE = 0.05;
+    static final UserContext context = new UserContext();
 
+    static {
+        context.register(UserType.CUSTOMER, new CustomerImpl());
+        context.register(UserType.EMPLOYEE, new EmployeeImpl());
+        context.register(UserType.AFFILIATE, new AffiliateImpl());
+    }
 
     public BigDecimal calculateTotal(List<Item> items) {
-        return items.stream().map(i -> i.getPrice()).reduce(BigDecimal.ZERO, BigDecimal::add);
+        return items.stream().map(Item::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public BigDecimal calculateTotalPerType(List<Item> items, ItemType type) {
         BigDecimal sum = new BigDecimal(0);
 
         if (type != null) {
-            sum = items.stream().filter(i -> type.equals(i.getType())).map(i -> i.getPrice()).reduce(BigDecimal.ZERO, BigDecimal::add);
+            sum = items.stream().filter(i -> type.equals(i.getType())).map(Item::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
         }
 
         return sum;
@@ -47,42 +47,15 @@ public class    DiscountHelper {
         if (user == null) {
             throw new NullPointerException("User cannot be null");
         }
-
-        BigDecimal discount = new BigDecimal(0);
-
         Set<UserAuthority> authorities = user.getAuthorities();
-        UserType type = authorities.stream().map(authority -> authority.getAuthority()).findAny().get();
+        UserType type = authorities.stream().map(UserAuthority::getAuthority).findAny().orElseThrow(InternalException::new);
 
-        switch (type) {
-            case EMPLOYEE:
-                discount = new BigDecimal(EMPLOYEE_DISCOUNT_PERCENTAGE).setScale(2, RoundingMode.HALF_EVEN);
-                break;
-
-            case AFFILIATE:
-                discount = new BigDecimal(AFFILIATE_DISCOUNT_PERCENTAGE).setScale(2, RoundingMode.HALF_EVEN);
-                break;
-
-            case CUSTOMER:
-                if (isCustomerSince(LocalDate.parse(user.getRegisterDate()), YEARS_FOR_DISCOUNT)) {
-                    discount = new BigDecimal(CUSTOMER_DISCOUNT_PERCENTAGE).setScale(2, RoundingMode.HALF_EVEN);
-                }
-                break;
-
-            default:
-                break;
-        }
-
-        return discount;
-    }
-
-    public boolean isCustomerSince(LocalDate registeredDate, long years) {
-        Period period = Period.between(registeredDate, LocalDate.now());
-        return period.getYears() >= years;
+        return (BigDecimal) context.call(type, user);
     }
 
     public BigDecimal calculateBillsDiscount(BigDecimal totalAmount, BigDecimal amount, BigDecimal discountAmount) {
         int value = totalAmount.divide(amount).intValue();
-        return discountAmount.multiply(new BigDecimal(value));
+        return discountAmount.multiply(BigDecimal.valueOf(value));
     }
 
     public BigDecimal calculateDiscount(BigDecimal amount, BigDecimal discount) {

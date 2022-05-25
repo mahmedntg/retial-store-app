@@ -6,23 +6,20 @@ import com.derayah.gateway.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.stream.Stream;
 
 /**
- * UserConfig.
+ * UserDetailsConfig.
  *
  * @author : Mo Sayed
  * @since : 5/24/2022
  */
 @Component
 @RequiredArgsConstructor
-public class UserConfig {
+public class UserDetailsConfig {
 
     private final UserRepository userRepository;
 
